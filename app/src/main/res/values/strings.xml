@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">BigFileFinder</string>
+    <string name="title_directories">Directories</string>
+    <string name="menu_title_search">Search</string>
+    <string name="menu_title_clear">Clear</string>
 </resources>
