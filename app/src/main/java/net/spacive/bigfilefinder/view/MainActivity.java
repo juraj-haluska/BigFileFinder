@@ -1,8 +1,10 @@
-package net.spacive.bigfilefinder;
+package net.spacive.bigfilefinder.view;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+
+import net.spacive.bigfilefinder.R;
 
 public class MainActivity extends AppCompatActivity {
 

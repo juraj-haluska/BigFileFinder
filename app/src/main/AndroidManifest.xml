@@ -3,13 +3,14 @@
     package="net.spacive.bigfilefinder">
 
     <application
+        android:name=".BigFileFinderApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="net.spacive.bigfilefinder.MainActivity">
+        <activity android:name="net.spacive.bigfilefinder.view.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
