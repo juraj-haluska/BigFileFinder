@@ -1,4 +1,4 @@
-package net.spacive.bigfilefinder;
+package net.spacive.bigfilefinder.viewmodel;
 
 import android.app.Application;
 
@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
+import net.spacive.bigfilefinder.BigFileFinderApp;
 import net.spacive.bigfilefinder.persistence.DirPathDao;
 import net.spacive.bigfilefinder.persistence.DirPathModel;
 

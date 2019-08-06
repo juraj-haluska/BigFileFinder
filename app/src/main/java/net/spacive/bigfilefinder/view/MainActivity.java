@@ -9,7 +9,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import net.spacive.bigfilefinder.BigFileFinderApp;
-import net.spacive.bigfilefinder.MainActivityViewModel;
+import net.spacive.bigfilefinder.viewmodel.MainActivityViewModel;
 import net.spacive.bigfilefinder.R;
 import net.spacive.bigfilefinder.databinding.ActivityMainBinding;
 import net.spacive.bigfilefinder.persistence.DirPathDao;
