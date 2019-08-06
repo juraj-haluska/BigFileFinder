@@ -13,7 +13,7 @@ public class BigFileFinderApp extends Application {
     private static AppDatabase appDatabase;
 
     // single instance of appDatabase
-    public AppDatabase getAppDatabase() {
+    public synchronized AppDatabase getAppDatabase() {
         if (appDatabase == null) {
 
             appDatabase = Room.databaseBuilder(getApplicationContext(),
