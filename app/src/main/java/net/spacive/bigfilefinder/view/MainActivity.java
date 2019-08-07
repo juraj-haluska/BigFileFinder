@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.MenuItem;
 
 import net.spacive.bigfilefinder.BigFileFinderApp;
@@ -14,6 +15,7 @@ import net.spacive.bigfilefinder.R;
 import net.spacive.bigfilefinder.databinding.ActivityMainBinding;
 import net.spacive.bigfilefinder.persistence.DirPathDao;
 import net.spacive.bigfilefinder.persistence.DirPathModel;
+import net.spacive.dirpickerdialog.DirPickerDialog;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -51,9 +53,11 @@ public class MainActivity extends AppCompatActivity {
         viewModel.getDirPaths().observe(this, dirPathAdapter::setDataset);
 
         binding.fab.setOnClickListener(view -> {
-            new Thread(() -> {
-                dirPathDao.addDirPathModel(new DirPathModel("item " + itemCounter++));
-            }).start();
+            new DirPickerDialog(this, Environment.getExternalStorageDirectory(), file -> {
+                new Thread(() -> {
+                    dirPathDao.addDirPathModel(new DirPathModel(file.getAbsolutePath()));
+                }).start();
+            }).show();
         });
 
         binding.toolbarSecondary.inflateMenu(R.menu.secondary_toolbar_menu);
