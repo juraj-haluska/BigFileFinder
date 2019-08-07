@@ -6,22 +6,22 @@ public class DirItemModel{
 
     private String dirName;
 
-    private File path;
+    private File file;
 
-    public DirItemModel(File path) {
-        this.path = path;
-        this.dirName = path.getName();
+    public DirItemModel(File file) {
+        this.file = file;
+        this.dirName = file.getName();
     }
 
     public String getDirName() {
         return dirName;
     }
 
-    public File getPath() {
-        return path;
+    public File getFile() {
+        return file;
     }
 
-    public void setPath(File path) {
-        this.path = path;
+    public void setFile(File file) {
+        this.file = file;
     }
 }

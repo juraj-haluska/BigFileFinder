@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import net.spacive.dirpickerdialog.databinding.ItemBackBinding;
 import net.spacive.dirpickerdialog.databinding.ItemDirectoryBinding;
 
+import java.io.File;
 import java.util.List;
 
 public class DirItemModelAdapter extends RecyclerView.Adapter<DirItemModelAdapter.GenericBindingViewHolder> {
@@ -20,6 +21,16 @@ public class DirItemModelAdapter extends RecyclerView.Adapter<DirItemModelAdapte
     private final int listOffset = 1;
 
     private List<DirItemModel> dataset;
+
+    private DirExplorerLogicProvider dirExplorerLogicProvider;
+
+    public interface DirExplorerLogicProvider {
+        boolean canGoBack();
+
+        void goBack();
+
+        void onFolderEntered(File file);
+    }
 
     static class GenericBindingViewHolder<T> extends RecyclerView.ViewHolder {
 
@@ -58,11 +69,24 @@ public class DirItemModelAdapter extends RecyclerView.Adapter<DirItemModelAdapte
     public void onBindViewHolder(@NonNull GenericBindingViewHolder holder, int position) {
         if (position < listOffset) {
             ItemBackBinding binding = (ItemBackBinding) holder.binding;
+
+            if (dirExplorerLogicProvider != null && dirExplorerLogicProvider.canGoBack()) {
+                binding.getRoot().setVisibility(View.VISIBLE);
+                binding.layoutBack.setOnClickListener(view -> dirExplorerLogicProvider.goBack());
+            } else {
+                binding.getRoot().setVisibility(View.GONE);
+            }
         } else {
             DirItemModel model = dataset.get(position - listOffset);
 
             ItemDirectoryBinding binding = (ItemDirectoryBinding) holder.binding;
             binding.setDirItem(model);
+
+            if (dirExplorerLogicProvider != null) {
+                binding.getRoot().setOnClickListener(view -> {
+                    dirExplorerLogicProvider.onFolderEntered(model.getFile());
+                });
+            }
         }
     }
 
@@ -78,5 +102,9 @@ public class DirItemModelAdapter extends RecyclerView.Adapter<DirItemModelAdapte
     public void setDataset(List<DirItemModel> dataset) {
         this.dataset = dataset;
         this.notifyDataSetChanged();
+    }
+
+    public void setDirExplorerLogicProvider(DirExplorerLogicProvider dirExplorerLogicProvider) {
+        this.dirExplorerLogicProvider = dirExplorerLogicProvider;
     }
 }
