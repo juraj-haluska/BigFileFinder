@@ -3,6 +3,7 @@ package net.spacive.bigfilefinder.view;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.os.Bundle;
@@ -17,6 +18,8 @@ import net.spacive.bigfilefinder.persistence.DirPathDao;
 import net.spacive.bigfilefinder.persistence.DirPathModel;
 import net.spacive.dirpickerdialog.DirPickerDialog;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
@@ -27,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
     private DirPathDao dirPathDao;
 
-    static int itemCounter = 0;
+    private List<DirPathModel> dataSet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,9 +51,22 @@ public class MainActivity extends AppCompatActivity {
         binding.recyclerDirPaths.addItemDecoration(
                 new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
+        ItemTouchHelper itemTouchHelper = new
+                ItemTouchHelper(new SwipeLeftRightCallback(itemPosition -> {
+                    if (this.dataSet != null && itemPosition < dataSet.size()) {
+                        new Thread(() -> {
+                            dirPathDao.deleteDirPathModel(dataSet.get(itemPosition));
+                        }).start();
+                    }
+        }));
+        itemTouchHelper.attachToRecyclerView(binding.recyclerDirPaths);
+
         viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
-        viewModel.getDirPaths().observe(this, dirPathAdapter::setDataset);
+        viewModel.getDirPaths().observe(this, dirPathModels -> {
+            dirPathAdapter.setDataset(dirPathModels);
+            this.dataSet = dirPathModels;
+        });
 
         binding.fab.setOnClickListener(view -> {
             new DirPickerDialog(this, Environment.getExternalStorageDirectory(), file -> {
