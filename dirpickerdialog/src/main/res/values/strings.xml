@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">DirPickerDialog</string>
+    <string name="title_dialog">Select a directory</string>
+</resources>
