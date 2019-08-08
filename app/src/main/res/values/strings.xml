@@ -1,6 +1,11 @@
 <resources>
     <string name="app_name">Big File Finder</string>
     <string name="title_directories">Directories</string>
+
     <string name="menu_title_search">Search</string>
     <string name="menu_title_clear">Clear</string>
+
+    <string name="notif_title">Finding the biggest files</string>
+    <string name="channel_name">Big File Finder Progress</string>
+    <string name="channel_description">Shows a progress of the biggest file finding process</string>
 </resources>
