@@ -35,6 +35,8 @@ public class MainActivityViewModel extends AndroidViewModel implements ClientCon
 
     private ServiceConnection connection;
 
+    private MutableLiveData<String> finderServiceProgress = new MutableLiveData<>();
+
     public MainActivityViewModel(@NonNull Application application) {
         super(application);
         BigFileFinderApp app = (BigFileFinderApp) application;
@@ -47,6 +49,10 @@ public class MainActivityViewModel extends AndroidViewModel implements ClientCon
 
     public LiveData<Boolean> isFinderServiceBound() {
         return finderServiceBound;
+    }
+
+    public MutableLiveData<String> getFinderServiceProgress() {
+        return finderServiceProgress;
     }
 
     public void startFinderService(int maxFiles, String[] files) {
@@ -99,7 +105,7 @@ public class MainActivityViewModel extends AndroidViewModel implements ClientCon
 
     @Override
     public void updateProgress(String fileName) {
-
+        finderServiceProgress.postValue(fileName);
     }
 
     @Override

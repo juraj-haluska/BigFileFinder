@@ -8,4 +8,9 @@
     <string name="notif_title">Finding the biggest files</string>
     <string name="channel_name">Big File Finder Progress</string>
     <string name="channel_description">Shows a progress of the biggest file finding process</string>
+
+    <string name="button_cancel">cancel</string>
+    <string name="button_start">start</string>
+
+    <string name="message_select_number">Select number of max biggest files</string>
 </resources>

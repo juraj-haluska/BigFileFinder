@@ -60,7 +60,6 @@ public class FinderService extends Service implements ServiceContract {
     public void onCreate() {
         super.onCreate();
 
-        // TODO: open activity with progress
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 this, 0, notificationIntent, 0);
@@ -124,6 +123,12 @@ public class FinderService extends Service implements ServiceContract {
 
                         if (clientContract != null) {
                             clientContract.updateProgress(file.getName());
+                        }
+
+                        try {
+                            Thread.sleep(10);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
                     }
                 });
