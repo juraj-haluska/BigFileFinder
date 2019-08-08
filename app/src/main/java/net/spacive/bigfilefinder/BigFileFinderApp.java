@@ -16,8 +16,8 @@ public class BigFileFinderApp extends Application {
     public synchronized AppDatabase getAppDatabase() {
         if (appDatabase == null) {
 
-            appDatabase = Room.databaseBuilder(getApplicationContext(),
-                    AppDatabase.class, DATABASE_NAME).build();
+            appDatabase = Room.inMemoryDatabaseBuilder(getApplicationContext(), AppDatabase.class)
+                    .build();
         }
 
         return appDatabase;

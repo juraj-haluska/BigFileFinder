@@ -21,6 +21,9 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".view.ViewResultsActivity"
+            android:label="@string/title_view_results"/>
+
         <service android:name=".service.FinderService" android:exported="false"/>
 
     </application>

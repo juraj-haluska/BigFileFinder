@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.MenuItem;
@@ -102,6 +103,13 @@ public class MainActivity extends AppCompatActivity {
 
         viewModel.getFinderServiceProgress().observe(this, s -> {
             binding.includedBottom.textStatus.setText(s);
+        });
+
+        viewModel.getResultsReady().observe(this, isReady -> {
+            if (isReady) {
+                Intent intent = new Intent(this, ViewResultsActivity.class);
+                startActivity(intent);
+            }
         });
     }
 

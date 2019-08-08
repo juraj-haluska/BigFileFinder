@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -17,12 +16,16 @@ import androidx.lifecycle.MutableLiveData;
 import net.spacive.bigfilefinder.BigFileFinderApp;
 import net.spacive.bigfilefinder.persistence.DirPathDao;
 import net.spacive.bigfilefinder.persistence.DirPathModel;
+import net.spacive.bigfilefinder.persistence.SearchResultDao;
+import net.spacive.bigfilefinder.persistence.SearchResultModel;
 import net.spacive.bigfilefinder.service.ClientContract;
 import net.spacive.bigfilefinder.service.FinderService;
 import net.spacive.bigfilefinder.service.ServiceContract;
 import net.spacive.bigfilefinder.util.SizedSortedSet;
 
 import java.io.File;
+import java.text.DecimalFormat;
+import java.util.Iterator;
 import java.util.List;
 
 public class MainActivityViewModel extends AndroidViewModel implements ClientContract {
@@ -36,6 +39,8 @@ public class MainActivityViewModel extends AndroidViewModel implements ClientCon
     private ServiceConnection connection;
 
     private MutableLiveData<String> finderServiceProgress = new MutableLiveData<>();
+
+    private MutableLiveData<Boolean> resultsReady = new MutableLiveData<>();
 
     public MainActivityViewModel(@NonNull Application application) {
         super(application);
@@ -51,8 +56,12 @@ public class MainActivityViewModel extends AndroidViewModel implements ClientCon
         return finderServiceBound;
     }
 
-    public MutableLiveData<String> getFinderServiceProgress() {
+    public LiveData<String> getFinderServiceProgress() {
         return finderServiceProgress;
+    }
+
+    public LiveData<Boolean> getResultsReady() {
+        return resultsReady;
     }
 
     public void startFinderService(int maxFiles, String[] files) {
@@ -111,5 +120,33 @@ public class MainActivityViewModel extends AndroidViewModel implements ClientCon
     @Override
     public void onResultsReady(SizedSortedSet<File> sortedSet) {
         unbindFinderService();
+
+        SearchResultDao searchResultDao = ((BigFileFinderApp) getApplication())
+                .getAppDatabase().searchResultDao();
+
+        new Thread(() -> {
+            searchResultDao.deleteAllSearchResults();
+
+            Iterator<File> iterator = sortedSet.descendingIterator();
+
+            int order = 1;
+            while (iterator.hasNext()) {
+                File f = iterator.next();
+                searchResultDao.addSearchResult(
+                        new SearchResultModel(f.getAbsolutePath(),
+                                f.getName(), order++, readableFileSize(f.length())));
+            }
+
+            resultsReady.postValue(true);
+        }).start();
+    }
+
+    // source: https://stackoverflow.com/questions/3263892/format-file-size-as-mb-gb-etc
+    private static String readableFileSize(long size) {
+        if(size <= 0) return "0";
+        final String[] units = new String[] { "B", "kB", "MB", "GB", "TB" };
+        int digitGroups = (int) (Math.log10(size)/Math.log10(1024));
+        return new DecimalFormat("#,##0.#")
+                .format(size/Math.pow(1024, digitGroups)) + " " + units[digitGroups];
     }
 }
