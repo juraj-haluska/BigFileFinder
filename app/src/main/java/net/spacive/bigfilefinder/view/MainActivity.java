@@ -13,12 +13,12 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.MenuItem;
 import android.view.View;
 
 import net.spacive.bigfilefinder.BigFileFinderApp;
 import net.spacive.bigfilefinder.databinding.DialogPickNumberBinding;
+import net.spacive.bigfilefinder.util.StorageManager;
 import net.spacive.bigfilefinder.viewmodel.MainActivityViewModel;
 import net.spacive.bigfilefinder.R;
 import net.spacive.bigfilefinder.databinding.ActivityMainBinding;
@@ -26,6 +26,8 @@ import net.spacive.bigfilefinder.persistence.DirPathDao;
 import net.spacive.bigfilefinder.persistence.DirPathModel;
 import net.spacive.dirpickerdialog.DirPickerDialog;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -100,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
             this.dataSet = dirPathModels;
         });
 
-        binding.fab.setOnClickListener(view -> showBrowseFolderDialog());
+        binding.fab.setOnClickListener(view -> showSelectStorageDialog());
     }
 
     void initFinderServiceObservers() {
@@ -116,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
             binding.toolbarSecondary.getMenu().findItem(R.id.menu_search)
                     .setEnabled(!isBound)
                     .getIcon()
-                    .setAlpha(isBound? 100 : 255);
+                    .setAlpha(isBound ? 100 : 255);
         });
 
         viewModel.getFinderServiceProgress().observe(this, s -> {
@@ -155,10 +157,12 @@ public class MainActivity extends AppCompatActivity {
                 .setView(binding.getRoot())
                 .setMessage(R.string.message_select_number)
                 .setPositiveButton(R.string.button_start, (dialogInterface, i) -> {
-                    int maxFiles = Integer.parseInt(binding.textNumber.getText().toString());
-                    checkFilePermissions(() -> startFindingService(maxFiles));
+                    if (!binding.textNumber.getText().toString().isEmpty()) {
+                        int maxFiles = Integer.parseInt(binding.textNumber.getText().toString());
+                        checkFilePermissions(() -> startFindingService(maxFiles));
+                    }
                 })
-                .setNegativeButton(R.string.button_cancel,null)
+                .setNegativeButton(R.string.button_cancel, null)
                 .show();
     }
 
@@ -221,9 +225,31 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void showBrowseFolderDialog() {
+    private void showSelectStorageDialog() {
         checkFilePermissions(() -> {
-            new DirPickerDialog(this, Environment.getExternalStorageDirectory(), file -> {
+            StorageManager manager = new StorageManager(this);
+
+            List<String> external = manager.getExternalStorage();
+            List<String> emulated = manager.getEmulatedStorage();
+
+            List<String> merged = new ArrayList<>();
+            merged.addAll(emulated);
+            merged.addAll(external);
+
+            String[] items = merged.toArray(new String[0]);
+
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.title_storage_area)
+                    .setItems(items, (dialogInterface, i) -> {
+                        showBrowseFolderDialog(new File(merged.get(i)));
+                    })
+                    .show();
+        });
+    }
+
+    private void showBrowseFolderDialog(File rootDir) {
+        checkFilePermissions(() -> {
+            new DirPickerDialog(this, rootDir, file -> {
                 new Thread(() -> {
                     dirPathDao.addDirPathModel(new DirPathModel(file.getAbsolutePath()));
                 }).start();

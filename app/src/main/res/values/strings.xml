@@ -5,6 +5,8 @@
     <string name="title_directories">Directories</string>
     <string name="title_result_detail">Full file path</string>
     <string name="title_warning">Warning!</string>
+    <string name="title_storage_area">Select storage area</string>
+
     <string name="message_rationale">This app needs read external files permission in order to work.</string>
 
     <string name="menu_title_search">Search</string>
