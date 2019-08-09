@@ -14,7 +14,17 @@ import java.util.List;
 
 public class ViewResultsAdapter extends RecyclerView.Adapter<ViewResultsAdapter.ViewResultsHolder> {
 
+    public interface OnResultClickListener {
+        void onResultClicked(SearchResultModel model);
+    }
+
     private List<SearchResultModel> dataset;
+
+    private OnResultClickListener listener;
+
+    public ViewResultsAdapter(OnResultClickListener listener) {
+        this.listener = listener;
+    }
 
     static class ViewResultsHolder extends RecyclerView.ViewHolder {
 
@@ -38,6 +48,11 @@ public class ViewResultsAdapter extends RecyclerView.Adapter<ViewResultsAdapter.
     @Override
     public void onBindViewHolder(@NonNull ViewResultsHolder holder, int position) {
         holder.binding.setResult(dataset.get(position));
+        holder.binding.itemResult.setOnClickListener(view -> {
+            if (listener != null){
+                listener.onResultClicked(dataset.get(position));
+            }
+        });
     }
 
     @Override

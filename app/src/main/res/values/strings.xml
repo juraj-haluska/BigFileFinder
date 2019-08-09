@@ -3,6 +3,7 @@
 
     <string name="title_view_results">Results</string>
     <string name="title_directories">Directories</string>
+    <string name="title_result_detail">Full file path</string>
 
     <string name="menu_title_search">Search</string>
     <string name="menu_title_clear">Clear</string>
