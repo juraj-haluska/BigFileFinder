@@ -15,7 +15,7 @@ import androidx.core.app.NotificationCompat;
 
 import net.spacive.bigfilefinder.R;
 import net.spacive.bigfilefinder.util.FileNode;
-import net.spacive.bigfilefinder.util.SizedSortedIterable;
+import net.spacive.bigfilefinder.util.SizedIterable;
 import net.spacive.bigfilefinder.util.TreeTraverser;
 import net.spacive.bigfilefinder.view.MainActivity;
 
@@ -118,8 +118,8 @@ public class FinderService extends Service implements ServiceContract {
 
     private void startServiceThread(String[] paths, int maxFiles) {
         new Thread(() -> {
-            SizedSortedIterable<File> sortedIterable =
-                    new SizedSortedIterable<>(maxFiles, fileComparator);
+            SizedIterable<File> sizedIterable =
+                    new SizedIterable<>(maxFiles, fileComparator);
 
             for (String path : paths) {
                 FileNode rootNode = new FileNode(new File(path));
@@ -129,25 +129,25 @@ public class FinderService extends Service implements ServiceContract {
                     File file = ((File) fileNode.getData());
 
                     if (file.isFile()) {
-                        sortedIterable.add(file);
+                        sizedIterable.add(file);
 
                         updateNotificationContent(file.getName());
 
                         if (clientContract != null) {
                             clientContract.updateProgress(file.getName());
                         }
-
-                        try {
-                            Thread.sleep(1);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
                     }
                 });
             }
 
             if (clientContract != null) {
-                clientContract.onResultsReady(sortedIterable);
+                clientContract.updateProgress(getString(R.string.notif_message));
+            }
+
+            sizedIterable.sort();
+
+            if (clientContract != null) {
+                clientContract.onResultsReady(sizedIterable);
             }
 
             isRunning = false;

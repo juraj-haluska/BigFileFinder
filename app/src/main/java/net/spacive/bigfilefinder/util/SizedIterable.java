@@ -8,7 +8,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
-public class SizedSortedIterable<T> implements Iterable<T> {
+public class SizedIterable<T> implements Iterable<T> {
 
     private final List<T> elements;
 
@@ -16,10 +16,22 @@ public class SizedSortedIterable<T> implements Iterable<T> {
 
     Comparator<T> comparator;
 
-    public SizedSortedIterable(int capacity, @NonNull Comparator<T> comparator) {
+    public SizedIterable(int capacity, @NonNull Comparator<T> comparator) {
         this.capacity = capacity;
         this.comparator = comparator;
         this.elements = new ArrayList<>(capacity);
+    }
+
+    private int getIndexOfMin() {
+        int minPos = 0;
+
+        for (int i = 1; i < elements.size(); i++) {
+            if (comparator.compare(elements.get(i), elements.get(minPos)) < 0) {
+                minPos = i;
+            }
+        }
+
+        return minPos;
     }
 
     public boolean add(T element) {
@@ -28,23 +40,17 @@ public class SizedSortedIterable<T> implements Iterable<T> {
         }
 
         if (elements.size() < capacity) {
-            if (elements.add(element)) {
-                Collections.sort(elements, comparator);
-                return true;
-            }
-
-            return false;
+            return elements.add(element);
         } else {
-            // check if currently added element is bigger than current minimum
-            T minimum = elements.get(0);
+            // check if currently added element is bigger than current minimums
+            int minIndex = getIndexOfMin();
 
+            T minimum = elements.get(minIndex);
             int result = comparator.compare(element, minimum);
 
             if (result >= 1) {
-                // remove the smallest element (the first one) and add the new one
-                elements.remove(0);
-                elements.add(element);
-                Collections.sort(elements, comparator);
+                // remove the smallest element and add the new one
+                elements.set(minIndex, element);
                 return true;
             } else {
                 // elements are the same, or new one is smaller
@@ -89,4 +95,9 @@ public class SizedSortedIterable<T> implements Iterable<T> {
             }
         };
     }
+
+    public void sort() {
+        Collections.sort(this.elements, comparator);
+    }
 }
+
