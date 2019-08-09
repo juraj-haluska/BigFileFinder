@@ -2,12 +2,16 @@ package net.spacive.bigfilefinder.view;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.MenuItem;
@@ -28,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = MainActivity.class.getSimpleName();
 
+    private static final int PERMISSION_REQUEST_READ_EXTERNAL = 50;
+
     private ActivityMainBinding binding;
 
     private DirPathAdapter dirPathAdapter;
@@ -37,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
     private DirPathDao dirPathDao;
 
     private List<DirPathModel> dataSet;
+
+    private Runnable requestedAction;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,13 +82,7 @@ public class MainActivity extends AppCompatActivity {
             this.dataSet = dirPathModels;
         });
 
-        binding.fab.setOnClickListener(view -> {
-            new DirPickerDialog(this, Environment.getExternalStorageDirectory(), file -> {
-                new Thread(() -> {
-                    dirPathDao.addDirPathModel(new DirPathModel(file.getAbsolutePath()));
-                }).start();
-            }).show();
-        });
+        binding.fab.setOnClickListener(view -> showBrowseFolderDialog());
 
         binding.toolbarSecondary.inflateMenu(R.menu.secondary_toolbar_menu);
         binding.toolbarSecondary.setOnMenuItemClickListener(this::onMenuItemClicked);
@@ -149,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
                 .setMessage(R.string.message_select_number)
                 .setPositiveButton(R.string.button_start, (dialogInterface, i) -> {
                     int maxFiles = Integer.parseInt(binding.textNumber.getText().toString());
-                    startFindingService(maxFiles);
+                    checkFilePermissions(() -> startFindingService(maxFiles));
                 })
                 .setNegativeButton(R.string.button_cancel,null)
                 .show();
@@ -164,5 +166,63 @@ public class MainActivity extends AppCompatActivity {
 
         viewModel.startFinderService(maxFiles, dirs);
         viewModel.bindFinderService();
+    }
+
+    private void checkFilePermissions(Runnable requestedAction) {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                showRationale();
+            } else {
+                requestFilePermissions();
+            }
+
+            this.requestedAction = requestedAction;
+        } else {
+            requestedAction.run();
+        }
+    }
+
+    private void requestFilePermissions() {
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                PERMISSION_REQUEST_READ_EXTERNAL);
+    }
+
+    private void showRationale() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.title_warning)
+                .setMessage(R.string.message_rationale)
+                .setPositiveButton(R.string.button_grant, (dialogInterface, i) -> {
+                    requestFilePermissions();
+                })
+                .show();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions, int[] grantResults) {
+
+        if (requestCode == PERMISSION_REQUEST_READ_EXTERNAL) {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (requestedAction != null) {
+                    requestedAction.run();
+                }
+            }
+        }
+    }
+
+    private void showBrowseFolderDialog() {
+        checkFilePermissions(() -> {
+            new DirPickerDialog(this, Environment.getExternalStorageDirectory(), file -> {
+                new Thread(() -> {
+                    dirPathDao.addDirPathModel(new DirPathModel(file.getAbsolutePath()));
+                }).start();
+            }).show();
+        });
     }
 }
