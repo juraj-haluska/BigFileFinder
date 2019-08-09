@@ -34,7 +34,9 @@ public class MainActivityViewModel extends AndroidViewModel implements ClientCon
 
     private DirPathDao dirPathDao;
 
-    private MutableLiveData<Boolean> finderServiceBound = new MutableLiveData<>();
+    private boolean serviceBound = false;
+
+    private MutableLiveData<Boolean> isServiceBound = new MutableLiveData<>();
 
     private ServiceConnection connection;
 
@@ -52,8 +54,8 @@ public class MainActivityViewModel extends AndroidViewModel implements ClientCon
         return dirPathDao.getDirPaths();
     }
 
-    public LiveData<Boolean> isFinderServiceBound() {
-        return finderServiceBound;
+    public LiveData<Boolean> isServiceBound() {
+        return isServiceBound;
     }
 
     public LiveData<String> getFinderServiceProgress() {
@@ -73,6 +75,10 @@ public class MainActivityViewModel extends AndroidViewModel implements ClientCon
     }
 
     public void bindFinderService() {
+        if (serviceBound) {
+            return;
+        }
+
         Intent intent = new Intent(getApplication(), FinderService.class);
 
         final ClientContract clientContract = this;
@@ -86,16 +92,16 @@ public class MainActivityViewModel extends AndroidViewModel implements ClientCon
                 service.onClientReceived(clientContract);
 
                 if (service.isRunning()) {
-                    finderServiceBound.postValue(true);
+                    updateServiceState(true);
                 } else {
-                    finderServiceBound.postValue(false);
+                    updateServiceState(false);
                     getApplication().unbindService(this);
                 }
             }
 
             @Override
             public void onServiceDisconnected(ComponentName componentName) {
-                finderServiceBound.postValue(false);
+                updateServiceState(false);
             }
         };
 
@@ -103,13 +109,15 @@ public class MainActivityViewModel extends AndroidViewModel implements ClientCon
     }
 
     public void unbindFinderService() {
-        if (connection != null) {
-            Boolean serviceBound = finderServiceBound.getValue();
-            if (serviceBound != null && serviceBound) {
-                getApplication().unbindService(connection);
-                finderServiceBound.postValue(false);
-            }
+        if (connection != null && serviceBound) {
+            getApplication().unbindService(connection);
+            updateServiceState(false);
         }
+    }
+
+    private void updateServiceState(boolean state) {
+        serviceBound = state;
+        isServiceBound.postValue(state);
     }
 
     @Override

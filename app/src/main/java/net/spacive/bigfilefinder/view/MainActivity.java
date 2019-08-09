@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         binding.toolbarSecondary.inflateMenu(R.menu.secondary_toolbar_menu);
         binding.toolbarSecondary.setOnMenuItemClickListener(this::onMenuItemClicked);
 
-        viewModel.isFinderServiceBound().observe(this, isBound -> {
+        viewModel.isServiceBound().observe(this, isBound -> {
             if (isBound) {
                 binding.includedBottom.bottomSheet.setVisibility(View.VISIBLE);
                 binding.fab.hide();
