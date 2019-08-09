@@ -30,8 +30,6 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String TAG = MainActivity.class.getSimpleName();
-
     private static final int PERMISSION_REQUEST_READ_EXTERNAL = 50;
 
     private ActivityMainBinding binding;
@@ -51,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
+        viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
         setContentView(binding.getRoot());
         setSupportActionBar(binding.toolbar);
@@ -58,6 +57,27 @@ public class MainActivity extends AppCompatActivity {
         BigFileFinderApp app = (BigFileFinderApp) getApplication();
         dirPathDao = app.getAppDatabase().dirPathDao();
 
+        initDirRecycler();
+
+        binding.toolbarSecondary.inflateMenu(R.menu.secondary_toolbar_menu);
+        binding.toolbarSecondary.setOnMenuItemClickListener(this::onMenuItemClicked);
+
+        initFinderServiceObservers();
+    }
+
+    @Override
+    protected void onResume() {
+        viewModel.bindFinderService();
+        super.onResume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        viewModel.unbindFinderService();
+        super.onDestroy();
+    }
+
+    void initDirRecycler() {
         dirPathAdapter = new DirPathAdapter();
 
         binding.recyclerDirPaths.setLayoutManager(new LinearLayoutManager(this));
@@ -75,18 +95,15 @@ public class MainActivity extends AppCompatActivity {
         }));
         itemTouchHelper.attachToRecyclerView(binding.recyclerDirPaths);
 
-        viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
-
         viewModel.getDirPaths().observe(this, dirPathModels -> {
             dirPathAdapter.setDataset(dirPathModels);
             this.dataSet = dirPathModels;
         });
 
         binding.fab.setOnClickListener(view -> showBrowseFolderDialog());
+    }
 
-        binding.toolbarSecondary.inflateMenu(R.menu.secondary_toolbar_menu);
-        binding.toolbarSecondary.setOnMenuItemClickListener(this::onMenuItemClicked);
-
+    void initFinderServiceObservers() {
         viewModel.isServiceBound().observe(this, isBound -> {
             if (isBound) {
                 binding.includedBottom.bottomSheet.setVisibility(View.VISIBLE);
@@ -112,18 +129,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-    }
-
-    @Override
-    protected void onResume() {
-        viewModel.bindFinderService();
-        super.onResume();
-    }
-
-    @Override
-    protected void onDestroy() {
-        viewModel.unbindFinderService();
-        super.onDestroy();
     }
 
     private boolean onMenuItemClicked(MenuItem item) {
