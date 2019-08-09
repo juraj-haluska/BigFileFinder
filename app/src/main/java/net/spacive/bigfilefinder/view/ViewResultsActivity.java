@@ -21,7 +21,9 @@ import java.util.List;
 public class ViewResultsActivity extends AppCompatActivity {
 
     private ActivityViewResultsBinding binding;
+
     private ViewResultsActivityViewModel viewModel;
+
     private ViewResultsAdapter adapter;
 
     @Override

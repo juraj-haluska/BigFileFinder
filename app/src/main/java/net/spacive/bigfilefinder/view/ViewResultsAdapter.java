@@ -15,6 +15,7 @@ import java.util.List;
 public class ViewResultsAdapter extends RecyclerView.Adapter<ViewResultsAdapter.ViewResultsHolder> {
 
     public interface OnResultClickListener {
+
         void onResultClicked(SearchResultModel model);
     }
 

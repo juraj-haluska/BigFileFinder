@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 public class SwipeLeftRightCallback extends ItemTouchHelper.SimpleCallback {
 
     public interface OnSwipedCallback {
+
         void onItemSwiped(int itemPosition);
     }
 

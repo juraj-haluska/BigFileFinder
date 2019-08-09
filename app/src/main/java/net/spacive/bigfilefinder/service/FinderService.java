@@ -25,15 +25,19 @@ import java.util.Comparator;
 public class FinderService extends Service implements ServiceContract {
 
     public static final String INTENT_KEY_FILES = "INTENT_KEY_FILES";
+
     public static final String INTENT_KEY_MAX_FILES = "INTENT_KEY_MAX_FILES";
 
     private static final String CHANNEL_ID = "FINDER";
+
     private static final int NOTIFICATION_ID = 50;
 
     private NotificationCompat.Builder notification;
+
     private NotificationManager notificationManager;
 
     private ClientContract clientContract;
+
     private boolean isRunning = false;
 
     private static final Comparator<File> fileComparator = (fileA, fileB) -> {
