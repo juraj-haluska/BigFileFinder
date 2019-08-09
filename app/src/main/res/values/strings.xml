@@ -14,5 +14,5 @@
     <string name="button_cancel">cancel</string>
     <string name="button_start">start</string>
 
-    <string name="message_select_number">Select number of max biggest files</string>
+    <string name="message_select_number">Select number of the most biggest files to find</string>
 </resources>

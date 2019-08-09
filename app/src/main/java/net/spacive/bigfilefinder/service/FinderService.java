@@ -15,7 +15,7 @@ import androidx.core.app.NotificationCompat;
 
 import net.spacive.bigfilefinder.R;
 import net.spacive.bigfilefinder.util.FileNode;
-import net.spacive.bigfilefinder.util.SizedSortedSet;
+import net.spacive.bigfilefinder.util.SizedSortedIterable;
 import net.spacive.bigfilefinder.util.TreeTraverser;
 import net.spacive.bigfilefinder.view.MainActivity;
 
@@ -37,7 +37,18 @@ public class FinderService extends Service implements ServiceContract {
     private boolean isRunning = false;
 
     private static final Comparator<File> fileComparator = (fileA, fileB) -> {
-        return Long.compare(fileA.length(), fileB.length());
+        if (fileA.length() > fileB.length()) return 1;
+        if (fileA.length() < fileB.length()) return -1;
+
+        // case where files have the same length - they can be
+        // the same file - in this case compare their path
+        if (fileA.getAbsolutePath().equals(fileB.getAbsolutePath())){
+            // they are same, ignore fileB than
+            return 0;
+        } else {
+            // add different file with same length to set
+            return 1;
+        }
     };
 
     private void startForeground() {
@@ -107,7 +118,8 @@ public class FinderService extends Service implements ServiceContract {
 
     private void startServiceThread(String[] paths, int maxFiles) {
         new Thread(() -> {
-            SizedSortedSet<File> sortedSet = new SizedSortedSet<>(maxFiles, fileComparator);
+            SizedSortedIterable<File> sortedIterable =
+                    new SizedSortedIterable<>(maxFiles, fileComparator);
 
             for (String path : paths) {
                 FileNode rootNode = new FileNode(new File(path));
@@ -117,7 +129,7 @@ public class FinderService extends Service implements ServiceContract {
                     File file = ((File) fileNode.getData());
 
                     if (file.isFile()) {
-                        sortedSet.add(file);
+                        sortedIterable.add(file);
 
                         updateNotificationContent(file.getName());
 
@@ -126,7 +138,7 @@ public class FinderService extends Service implements ServiceContract {
                         }
 
                         try {
-                            Thread.sleep(10);
+                            Thread.sleep(1);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -135,7 +147,7 @@ public class FinderService extends Service implements ServiceContract {
             }
 
             if (clientContract != null) {
-                clientContract.onResultsReady(sortedSet);
+                clientContract.onResultsReady(sortedIterable);
             }
 
             isRunning = false;

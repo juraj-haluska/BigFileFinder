@@ -22,7 +22,6 @@ import net.spacive.bigfilefinder.persistence.DirPathDao;
 import net.spacive.bigfilefinder.persistence.DirPathModel;
 import net.spacive.dirpickerdialog.DirPickerDialog;
 
-import java.io.File;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -157,9 +156,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startFindingService(int maxFiles) {
-        File rootDir = Environment.getExternalStorageDirectory();
+        String [] dirs = new String[this.dataSet.size()];
 
-        viewModel.startFinderService(maxFiles, new String[]{rootDir.getAbsolutePath()});
+        for (int i = 0; i < this.dataSet.size(); i++) {
+            dirs[i] = this.dataSet.get(i).getPath();
+        }
+
+        viewModel.startFinderService(maxFiles, dirs);
         viewModel.bindFinderService();
     }
 }

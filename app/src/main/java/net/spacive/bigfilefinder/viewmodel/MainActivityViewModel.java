@@ -21,7 +21,7 @@ import net.spacive.bigfilefinder.persistence.SearchResultModel;
 import net.spacive.bigfilefinder.service.ClientContract;
 import net.spacive.bigfilefinder.service.FinderService;
 import net.spacive.bigfilefinder.service.ServiceContract;
-import net.spacive.bigfilefinder.util.SizedSortedSet;
+import net.spacive.bigfilefinder.util.SizedSortedIterable;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -29,8 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 
 public class MainActivityViewModel extends AndroidViewModel implements ClientContract {
-
-    public static final String TAG = MainActivityViewModel.class.getSimpleName();
 
     private DirPathDao dirPathDao;
 
@@ -126,7 +124,7 @@ public class MainActivityViewModel extends AndroidViewModel implements ClientCon
     }
 
     @Override
-    public void onResultsReady(SizedSortedSet<File> sortedSet) {
+    public void onResultsReady(SizedSortedIterable<File> sortedIterable) {
         unbindFinderService();
 
         SearchResultDao searchResultDao = ((BigFileFinderApp) getApplication())
@@ -135,7 +133,7 @@ public class MainActivityViewModel extends AndroidViewModel implements ClientCon
         new Thread(() -> {
             searchResultDao.deleteAllSearchResults();
 
-            Iterator<File> iterator = sortedSet.descendingIterator();
+            Iterator<File> iterator = sortedIterable.descendingIterator();
 
             int order = 1;
             while (iterator.hasNext()) {
