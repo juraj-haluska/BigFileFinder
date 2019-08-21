@@ -83,7 +83,7 @@ public class ViewResultsActivity extends AppCompatActivity {
                         onShowFullPath(model.getPath());
                     }
                 })
-                .setNeutralButton(android.R.string.cancel, null)
+                .setNeutralButton(R.string.button_cancel, null)
                 .show();
     }
 
