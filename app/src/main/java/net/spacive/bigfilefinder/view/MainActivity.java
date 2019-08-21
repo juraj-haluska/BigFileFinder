@@ -32,7 +32,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int PERMISSION_REQUEST_READ_EXTERNAL = 50;
+    private static final int PERMISSION_REQUEST_WRITE_EXTERNAL = 50;
 
     private ActivityMainBinding binding;
 
@@ -179,11 +179,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void checkFilePermissions(Runnable requestedAction) {
         if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.READ_EXTERNAL_STORAGE)
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 showRationale();
             } else {
                 requestFilePermissions();
@@ -197,8 +197,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void requestFilePermissions() {
         ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                PERMISSION_REQUEST_READ_EXTERNAL);
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                PERMISSION_REQUEST_WRITE_EXTERNAL);
     }
 
     private void showRationale() {
@@ -215,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode,
                                            String[] permissions, int[] grantResults) {
 
-        if (requestCode == PERMISSION_REQUEST_READ_EXTERNAL) {
+        if (requestCode == PERMISSION_REQUEST_WRITE_EXTERNAL) {
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 if (requestedAction != null) {

@@ -1,6 +1,7 @@
 package net.spacive.bigfilefinder.persistence;
 
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
@@ -18,4 +19,7 @@ public interface SearchResultDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void addSearchResult(SearchResultModel searchResultModel);
+
+    @Delete
+    void delete(SearchResultModel searchResultModel);
 }

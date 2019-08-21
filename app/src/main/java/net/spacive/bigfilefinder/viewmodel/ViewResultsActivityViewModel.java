@@ -24,4 +24,8 @@ public class ViewResultsActivityViewModel extends AndroidViewModel {
     public List<SearchResultModel> getSearchResults() {
         return searchResultDao.getSearchResults();
     }
+
+    public void deleteSearchResult(SearchResultModel searchResult) {
+        searchResultDao.delete(searchResult);
+    }
 }

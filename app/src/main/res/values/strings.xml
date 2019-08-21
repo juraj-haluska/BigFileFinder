@@ -21,6 +21,15 @@
     <string name="button_cancel">cancel</string>
     <string name="button_start">start</string>
     <string name="button_grant">grant</string>
+    <string name="button_copy">copy to clipboard</string>
 
     <string name="message_select_number">Select number of the most biggest files to find</string>
+
+    <string name="action_delete">Delete</string>
+    <string name="action_view_full_path">View full path</string>
+
+    <string name="snack_file_deleted">File has been deleted</string>
+    <string name="snack_file_error">Error occurred while deleting file</string>
+
+    <string name="label_clipboard">File path</string>
 </resources>

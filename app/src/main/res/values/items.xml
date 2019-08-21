@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="items_file_action">
+        <item>@string/action_delete</item>
+        <item>@string/action_view_full_path</item>
+    </string-array>
+</resources>
