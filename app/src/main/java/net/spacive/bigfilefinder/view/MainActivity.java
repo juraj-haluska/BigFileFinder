@@ -98,6 +98,13 @@ public class MainActivity extends AppCompatActivity {
         itemTouchHelper.attachToRecyclerView(binding.recyclerDirPaths);
 
         viewModel.getDirPaths().observe(this, dirPathModels -> {
+
+            if (dirPathModels.isEmpty()) {
+                binding.emptyState.setVisibility(View.VISIBLE);
+            } else {
+                binding.emptyState.setVisibility(View.GONE);
+            }
+
             dirPathAdapter.setDataset(dirPathModels);
             this.dataSet = dirPathModels;
         });
